@@ -28,12 +28,11 @@ public class LuckPermsListener {
         eventBus.subscribe(NodeAddEvent.class, this::onNodeAdd);
         eventBus.subscribe(NodeRemoveEvent.class, this::onNodeRemove);
         eventBus.subscribe(NodeClearEvent.class, this::onNodeClear);
-        eventBus.subscribe(NodeMutateEvent.class, this::onNodeMutate);
     }
 
     private void onNodeAdd(NodeAddEvent e) {
         Node node = e.getNode();
-        if (!node.getKey().startsWith("personal-borders")) {
+        if (!node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
             return;
         }
         if (e.isUser()) {
@@ -45,7 +44,7 @@ public class LuckPermsListener {
 
     private void onNodeRemove(NodeRemoveEvent e) {
         Node node = e.getNode();
-        if (!node.getKey().startsWith("personal-borders")) {
+        if (!node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
             return;
         }
 
@@ -58,28 +57,11 @@ public class LuckPermsListener {
 
     private void onNodeClear(NodeClearEvent e) {
         for (Node node : e.getNodes()) {
-            if (node.getKey().startsWith("personal-borders")) {
+            if (node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
                 if (e.isUser()) {
                     updateForTarget((User) e.getTarget());
                 } else if (e.isGroup()) {
                     updateForTarget((Group) e.getTarget());
-                }
-            }
-        }
-    }
-
-    private void onNodeMutate(NodeMutateEvent e) {
-        if (e instanceof NodeAddEvent || e instanceof NodeRemoveEvent || e instanceof NodeClearEvent) {
-            return;
-        }
-
-        for (Node node : e.getDataAfter()) {
-            if (node.getKey().startsWith("personal-borders")) {
-                if (e.isUser()) {
-                    updateForTarget((User) e.getTarget());
-                } else if (e.isGroup()) {
-                    updateForTarget((Group) e.getTarget());
-
                 }
             }
         }
