@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "personal-borders",
+	"version": "${version}",
+	"name": "Personal Borders",
+	"description": "Mod that adds player-specific borders to the world",
+	"authors": [
+		"NikitaCartes"
+	],
+	"contact": {
+		"homepage": "https://discord.gg/UY4nhvUzaK",
+		"sources": "https://github.com/NikitaCartes/Personal-Borders"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"xyz.nikitacartes.personalborders.PersonalBorders"
+		]
+	},
+	"mixins": [
+		"personal-borders.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+		"luckperms": "*"
+	}
+}
