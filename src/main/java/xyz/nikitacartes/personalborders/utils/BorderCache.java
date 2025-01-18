@@ -11,6 +11,9 @@ import xyz.nikitacartes.personalborders.PersonalBorders;
 import java.util.Map;
 import java.util.Set;
 
+import static xyz.nikitacartes.personalborders.PersonalBorders.server;
+import static xyz.nikitacartes.personalborders.utils.PersonalBordersLogger.LogDebug;
+
 public class BorderCache {
 
     private final WorldBorder overworldBorder;
@@ -18,11 +21,23 @@ public class BorderCache {
     private final WorldBorder endBorder;
 
     public BorderCache(Node defaultBorderNote, Node overworldBorderNode, Node netherBorderNode, Node endBorderNode) {
-        WorldBorder defaultBorder = getBorderFromNode(defaultBorderNote, PersonalBorders.server.getOverworld().getWorldBorder());
+        WorldBorder defaultBorder = getBorderFromNode(defaultBorderNote, server.getOverworld().getWorldBorder(), 1);
 
-        this.overworldBorder = getBorderFromNode(overworldBorderNode, defaultBorder);
-        this.netherBorder = getBorderFromNode(netherBorderNode, defaultBorder);
-        this.endBorder = getBorderFromNode(endBorderNode, defaultBorder);
+        this.overworldBorder = getBorderFromNode(overworldBorderNode, defaultBorder, 1);
+        this.netherBorder = getBorderFromNode(netherBorderNode, defaultBorder, 8);
+        this.endBorder = getBorderFromNode(endBorderNode, defaultBorder,1);
+    }
+
+    public WorldBorder getOverworldBorder() {
+        return this.overworldBorder;
+    }
+
+    public WorldBorder getNetherBorder() {
+        return this.netherBorder;
+    }
+
+    public WorldBorder getEndBorder() {
+        return this.endBorder;
     }
 
     public void sendOverworldBorder(ServerPlayNetworkHandler netHandler) {
@@ -40,41 +55,41 @@ public class BorderCache {
     public void sendBorder(ServerPlayerEntity player) {
         if (player.getServerWorld().getRegistryKey().equals(World.OVERWORLD)) {
             sendOverworldBorder(player.networkHandler);
-            // LogDebug("Sent overworld border to " + player.getNameForScoreboard());
-            // LogDebug("{x: " + this.overworldBorder.getCenterX() + ", z: " + this.overworldBorder.getCenterZ() + ", radius: " + this.overworldBorder.getMaxRadius() + "}");
+            LogDebug("Sent overworld border to " + player.getNameForScoreboard());
+            LogDebug("{x: " + this.overworldBorder.getCenterX() + ", z: " + this.overworldBorder.getCenterZ() + ", distance: " + this.overworldBorder.getSize() + "}");
         } else if (player.getServerWorld().getRegistryKey().equals(World.NETHER)) {
             sendNetherBorder(player.networkHandler);
-            // LogDebug("Sent nether border to " + player.getNameForScoreboard());
-            // LogDebug("{x: " + this.netherBorder.getCenterX() + ", z: " + this.netherBorder.getCenterZ() + ", radius: " + this.netherBorder.getMaxRadius() + "}");
+            LogDebug("Sent nether border to " + player.getNameForScoreboard());
+            LogDebug("{x: " + this.netherBorder.getCenterX() + ", z: " + this.netherBorder.getCenterZ() + ", distance: " + this.netherBorder.getSize() + "}");
         } else if (player.getServerWorld().getRegistryKey().equals(World.END)) {
             sendEndBorder(player.networkHandler);
-            // LogDebug("Sent end border to " + player.getNameForScoreboard());
-            // LogDebug("{x: " + this.endBorder.getCenterX() + ", z: " + this.endBorder.getCenterZ() + ", radius: " + this.endBorder.getMaxRadius() + "}");
+            LogDebug("Sent end border to " + player.getNameForScoreboard());
+            LogDebug("{x: " + this.endBorder.getCenterX() + ", z: " + this.endBorder.getCenterZ() + ", distance: " + this.endBorder.getSize() + "}");
         }
     }
 
-    private WorldBorder getBorderFromNode(Node node, WorldBorder defaultBorder) {
+    private WorldBorder getBorderFromNode(Node node, WorldBorder defaultBorder, double coordinateScale) {
         if (node == null) {
             return defaultBorder;
         }
 
         Map<String, Set<String>> context = node.getContexts().toMap();
-        int centerX = Integer.parseInt(context.getOrDefault("center.x", Set.of(Integer.toString((int)defaultBorder.getCenterX()))).iterator().next());
-        int centerZ = Integer.parseInt(context.getOrDefault("center.z", Set.of(Integer.toString((int)defaultBorder.getCenterZ()))).iterator().next());
-        int radius = Integer.parseInt(context.getOrDefault("radius", Set.of(Integer.toString(defaultBorder.getMaxRadius()))).iterator().next());
+        double centerX = Double.parseDouble(context.getOrDefault("center.x", Set.of(Double.toString(defaultBorder.getCenterX()))).iterator().next()) * coordinateScale;
+        double centerZ = Double.parseDouble(context.getOrDefault("center.z", Set.of(Double.toString(defaultBorder.getCenterZ()))).iterator().next()) * coordinateScale;
+        double distance = Double.parseDouble(context.getOrDefault("distance", Set.of(Double.toString(defaultBorder.getSize()))).iterator().next());
         int warningBlocks = Integer.parseInt(context.getOrDefault("warning.distance", Set.of(Integer.toString(defaultBorder.getWarningBlocks()))).iterator().next());
         int warningTime = Integer.parseInt(context.getOrDefault("warning.time", Set.of(Integer.toString(defaultBorder.getWarningTime()))).iterator().next());
         double damagePerBlock = Double.parseDouble(context.getOrDefault("damage.amount", Set.of(Double.toString(defaultBorder.getDamagePerBlock()))).iterator().next());
         double safeZone = Double.parseDouble(context.getOrDefault("damage.buffer", Set.of(Double.toString(defaultBorder.getSafeZone()))).iterator().next());
 
         WorldBorder border = new WorldBorder();
-        border.setSize(radius * 2);
         border.setCenter(centerX, centerZ);
-        border.setMaxRadius(radius);
-        border.setWarningBlocks(warningBlocks);
-        border.setWarningTime(warningTime);
         border.setDamagePerBlock(damagePerBlock);
         border.setSafeZone(safeZone);
+        border.setWarningBlocks(warningBlocks);
+        border.setWarningTime(warningTime);
+        border.setSize(distance);
+        border.setMaxRadius(server.getMaxWorldBorderRadius());
 
         return border;
     }

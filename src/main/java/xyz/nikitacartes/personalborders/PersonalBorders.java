@@ -3,10 +3,10 @@ package xyz.nikitacartes.personalborders;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.data.NodeMap;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
@@ -34,7 +34,6 @@ public class PersonalBorders implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ServerTickEvents.END_SERVER_TICK.register(this::onServerTick);
 		ServerLifecycleEvents.SERVER_STARTED.register(this::onStartServer);
 
 		ServerPlayConnectionEvents.JOIN.register((netHandler, packetSender, server) -> onPlayerJoin(netHandler.getPlayer().getUuid()));
@@ -51,6 +50,12 @@ public class PersonalBorders implements ModInitializer {
 		if (defaultGroup == null) {
 			return;
 		}
+
+		CachedPermissionData permissionData = defaultGroup.getCachedData().getPermissionData();
+		permissionData.checkPermission("personal-borders");
+		permissionData.checkPermission("personal-borders.overworld");
+		permissionData.checkPermission("personal-borders.the_nether");
+		permissionData.checkPermission("personal-borders.the_end");
 
 		boolean hasBorder = defaultGroup.getNodes().stream().anyMatch(node -> node.getKey().startsWith("personal-borders"));
 		if (hasBorder) {
@@ -123,20 +128,11 @@ public class PersonalBorders implements ModInitializer {
 				.value(false)
 				.withContext("center.x", Integer.toString((int) defaultBorder.getCenterX()))
 				.withContext("center.z", Integer.toString((int) defaultBorder.getCenterZ()))
-				.withContext("radius", Integer.toString(defaultBorder.getMaxRadius()))
+				.withContext("distance", Integer.toString((int) defaultBorder.getSize()))
 				.withContext("warning.distance", Integer.toString(defaultBorder.getWarningBlocks()))
 				.withContext("warning.time", Integer.toString(defaultBorder.getWarningTime()))
 				.withContext("damage.amount", Double.toString(defaultBorder.getDamagePerBlock()))
 				.withContext("damage.buffer", Double.toString(defaultBorder.getSafeZone()))
 				.build();
-	}
-
-	private void onServerTick(MinecraftServer server) {
-		for (Map.Entry<UUID, BorderCache> entry : borders.entrySet()) {
-			ServerPlayerEntity player = server.getPlayerManager().getPlayer(entry.getKey());
-			if (player != null) {
-				entry.getValue().sendBorder(player);
-			}
-		}
 	}
 }
