@@ -73,6 +73,10 @@ public class BorderCache {
             return defaultBorder;
         }
 
+        if (!node.getValue()) {
+            return defaultBorder;
+        }
+
         Map<String, Set<String>> context = node.getContexts().toMap();
         double centerX = Double.parseDouble(context.getOrDefault("center.x", Set.of(Double.toString(defaultBorder.getCenterX()))).iterator().next()) * coordinateScale;
         double centerZ = Double.parseDouble(context.getOrDefault("center.z", Set.of(Double.toString(defaultBorder.getCenterZ()))).iterator().next()) * coordinateScale;

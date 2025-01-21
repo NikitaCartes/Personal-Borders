@@ -1,3 +1,8 @@
+### 0.4.0
+##### Minecraft 1.21.1
+
+1) Apply border only if permission node is enabled
+
 ### 0.3.0
 ##### Minecraft 1.21.1
 
