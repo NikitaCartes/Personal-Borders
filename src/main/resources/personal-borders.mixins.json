@@ -3,7 +3,17 @@
   "package": "xyz.nikitacartes.personalborders.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "PlayerManagerMixin"
+    "BedBlockMixin",
+    "CollisionViewMixin",
+    "DismountingMixin",
+    "EntityMixin",
+    "LivingEntityMixin",
+    "NetherPortalBlockMixin",
+    "PlayerManagerMixin",
+    "PortalForcerMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "ServerWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

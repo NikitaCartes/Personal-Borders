@@ -6,7 +6,6 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import xyz.nikitacartes.personalborders.PersonalBorders;
 
 import java.util.Map;
 import java.util.Set;
@@ -96,5 +95,16 @@ public class BorderCache {
         border.setMaxRadius(server.getMaxWorldBorderRadius());
 
         return border;
+    }
+
+    public WorldBorder getWorldBorder(World world) {
+        if (world.getRegistryKey().equals(World.OVERWORLD)) {
+            return this.overworldBorder;
+        } else if (world.getRegistryKey().equals(World.NETHER)) {
+            return this.netherBorder;
+        } else if (world.getRegistryKey().equals(World.END)) {
+            return this.endBorder;
+        }
+        return world.getWorldBorder();
     }
 }

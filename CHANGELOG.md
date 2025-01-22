@@ -1,3 +1,8 @@
+### 0.5.0
+##### Minecraft 1.21.1
+
+1) Just mixin in every call of `getWorldBorder`
+
 ### 0.4.0
 ##### Minecraft 1.21.1
 
