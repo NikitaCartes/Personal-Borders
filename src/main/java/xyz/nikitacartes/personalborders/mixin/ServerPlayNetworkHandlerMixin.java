@@ -7,8 +7,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import xyz.nikitacartes.personalborders.utils.BorderCache;
 
-import static xyz.nikitacartes.personalborders.PersonalBorders.borders;
+import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
@@ -18,10 +19,10 @@ public class ServerPlayNetworkHandlerMixin {
 					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
 	private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos) {
 		LivingEntity entity = ((ServerPlayNetworkHandler)(Object)this).player;
-		if (entity != null && borders.containsKey(entity.getUuid())) {
-			return borders.get(entity.getUuid()).getWorldBorder(entity.getEntityWorld());
+		BorderCache borderCache = getBorderCache(entity);
+		if (borderCache != null) {
+			return borderCache.getWorldBorder(entity.getEntityWorld());
 		}
-		// Todo: add checks for other entities with owner
 		return defaultBorder;
 	}
 }

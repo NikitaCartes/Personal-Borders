@@ -18,6 +18,7 @@ repositories {
 }
 
 loom {
+	accessWidenerPath = file("src/main/resources/personal-borders.accesswidener")
 	serverOnlyMinecraftJar()
 }
 

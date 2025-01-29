@@ -1,13 +1,19 @@
 package xyz.nikitacartes.personalborders.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import xyz.nikitacartes.personalborders.utils.BorderCache;
 
-import static xyz.nikitacartes.personalborders.PersonalBorders.borders;
+import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
@@ -17,10 +23,22 @@ public class ServerPlayerEntityMixin {
 					target = "Lnet/minecraft/world/border/WorldBorder;getDistanceInsideBorder(DD)D"))
 	private WorldBorder modifyContains(WorldBorder defaultBorder, double x, double z) {
 		LivingEntity entity = ((LivingEntity)(Object)this);
-		if (entity != null && borders.containsKey(entity.getUuid())) {
-			return borders.get(entity.getUuid()).getWorldBorder(entity.getEntityWorld());
+		BorderCache borderCache = getOfflineBorderCache(entity.getUuid());
+		if (borderCache != null) {
+			return borderCache.getWorldBorder(entity.getEntityWorld());
 		}
-		// Todo: add checks for other entities with owner
 		return defaultBorder;
+	}
+
+	@ModifyExpressionValue(method = "<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V",
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
+	private static BlockPos sendModifiedBorder(BlockPos original, @Local(argsOnly = true) ServerWorld world, @Local(argsOnly = true) GameProfile profile) {
+		BorderCache borderCache = getOfflineBorderCache(profile.getId());
+		if (borderCache != null) {
+			WorldBorder border = borderCache.getWorldBorder(world);
+			return getModifiedSpawnPos(world, border, original);
+		}
+		return original;
 	}
 }

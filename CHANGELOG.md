@@ -1,3 +1,9 @@
+### 0.6.0
+##### Minecraft 1.21.1
+
+1) Add restriction for mobs
+2) Fix spawn location for players
+
 ### 0.5.0
 ##### Minecraft 1.21.1
 

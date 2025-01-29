@@ -6,6 +6,7 @@
     "BedBlockMixin",
     "CollisionViewMixin",
     "DismountingMixin",
+    "EndPortalBlockMixin",
     "EntityMixin",
     "LivingEntityMixin",
     "NetherPortalBlockMixin",
@@ -13,9 +14,10 @@
     "PortalForcerMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
-    "ServerWorldMixin"
+    "ServerWorldMixin",
+    "TeleportTargetMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }

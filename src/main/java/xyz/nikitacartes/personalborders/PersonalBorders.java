@@ -12,8 +12,16 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.query.QueryOptions;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.Tameable;
+import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import xyz.nikitacartes.personalborders.listener.LuckPermsListener;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
@@ -37,7 +45,7 @@ public class PersonalBorders implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(this::onStartServer);
 
 		ServerPlayConnectionEvents.JOIN.register((netHandler, packetSender, server) -> onPlayerJoin(netHandler.getPlayer().getUuid()));
-		ServerPlayConnectionEvents.DISCONNECT.register((netHandler, server) -> borders.remove(netHandler.getPlayer().getUuid()));
+		// ServerPlayConnectionEvents.DISCONNECT.register((netHandler, server) -> borders.remove(netHandler.getPlayer().getUuid()));
 	}
 
 	private void onStartServer(MinecraftServer server) {
@@ -50,6 +58,15 @@ public class PersonalBorders implements ModInitializer {
 		if (defaultGroup == null) {
 			return;
 		}
+
+		// Check time
+		LogDebug("Loading borders for all users...");
+		long startTime = System.currentTimeMillis();
+		luckPerms.getUserManager().getUniqueUsers().join().forEach(user -> {
+			borders.put(user, getOfflineBorderCache(user));
+		});
+		LogDebug("Loaded borders for all users in " + (System.currentTimeMillis() - startTime) + "ms");
+
 
 		CachedPermissionData permissionData = defaultGroup.getCachedData().getPermissionData();
 		permissionData.checkPermission("personal-borders");
@@ -134,5 +151,91 @@ public class PersonalBorders implements ModInitializer {
 				.withContext("damage.amount", Double.toString(defaultBorder.getDamagePerBlock()))
 				.withContext("damage.buffer", Double.toString(defaultBorder.getSafeZone()))
 				.build();
+	}
+
+	public static BorderCache getOfflineBorderCache(UUID uuid) {
+		BorderCache borderCache = borders.get(uuid);
+		if (borderCache != null) {
+			return borderCache;
+		}
+		User user = luckPerms.getUserManager().getUser(uuid);
+		if (user != null) {
+			return getBorderCache(user.resolveInheritedNodes(QueryOptions.nonContextual()));
+		}
+
+		LogDebug("Loading border for offline player: " + uuid);
+		user = luckPerms.getUserManager().loadUser(uuid).join(); // ToDo: This is blocking, find a better way.
+		if (user != null) {
+			return getBorderCache(user.resolveInheritedNodes(QueryOptions.nonContextual()));
+		}
+		return null;
+	}
+
+	public static BorderCache getBorderCache(Entity entity) {
+		UUID uuid = getCorrectUuid(entity);
+		if (uuid == null) {
+			return null;
+		}
+		BorderCache cache = borders.get(uuid);
+		if (cache == null) {
+			cache = getOfflineBorderCache(uuid);
+		}
+		return cache;
+	}
+
+	private static UUID getCorrectUuid(Entity entity) {
+		if (entity == null) {
+			return null;
+		}
+
+		if (entity instanceof PlayerEntity) {
+			return entity.getUuid();
+		}
+
+		UUID uuid = getPlayerPassengerUUID(entity);
+		if (uuid != null) {
+			return uuid;
+		}
+
+		if (entity instanceof ProjectileEntity projectileEntity) {
+			return projectileEntity.ownerUuid;
+		}
+
+		if (entity instanceof HorseEntity horseEntity) {
+			return horseEntity.getOwnerUuid();
+		}
+
+		if (entity instanceof Tameable tameable) {
+			return tameable.getOwnerUuid();
+		}
+
+		return null;
+	}
+
+	private static UUID getPlayerPassengerUUID(Entity entity) {
+		if (!entity.hasPassengers()) {
+			return null;
+		}
+
+		for (Entity passenger : entity.getPassengerList()) {
+			if (passenger instanceof PlayerEntity) {
+				return passenger.getUuid();
+			}
+
+			UUID uuid = getPlayerPassengerUUID(passenger);
+			if (uuid != null) {
+				return uuid;
+			}
+		}
+
+		return null;
+	}
+
+	public static BlockPos getModifiedSpawnPos(World world, WorldBorder worldBorder, BlockPos originalSpawnPos) {
+		if (!worldBorder.contains(originalSpawnPos)) {
+			return world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
+		}
+
+		return originalSpawnPos;
 	}
 }

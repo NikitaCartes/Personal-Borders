@@ -35,6 +35,7 @@ public class LuckPermsListener {
         if (!node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
             return;
         }
+
         if (e.isUser()) {
             updateForTarget((User) e.getTarget());
         } else if (e.isGroup()) {
@@ -57,12 +58,14 @@ public class LuckPermsListener {
 
     private void onNodeClear(NodeClearEvent e) {
         for (Node node : e.getNodes()) {
-            if (node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
-                if (e.isUser()) {
-                    updateForTarget((User) e.getTarget());
-                } else if (e.isGroup()) {
-                    updateForTarget((Group) e.getTarget());
-                }
+            if (!node.getKey().startsWith("personal-borders") && !node.getKey().startsWith("group.")) {
+                return;
+            }
+
+            if (e.isUser()) {
+                updateForTarget((User) e.getTarget());
+            } else if (e.isGroup()) {
+                updateForTarget((Group) e.getTarget());
             }
         }
     }

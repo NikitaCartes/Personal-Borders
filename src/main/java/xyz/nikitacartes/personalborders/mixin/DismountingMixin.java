@@ -9,8 +9,9 @@ import net.minecraft.world.CollisionView;
 import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import xyz.nikitacartes.personalborders.utils.BorderCache;
 
-import static xyz.nikitacartes.personalborders.PersonalBorders.borders;
+import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 
 @Mixin(Dismounting.class)
 public class DismountingMixin {
@@ -19,10 +20,10 @@ public class DismountingMixin {
 			at = @At(value = "INVOKE",
 					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
 	private static WorldBorder sendModifiedBorder(WorldBorder defaultBorder, Box box, @Local(argsOnly = true) LivingEntity entity, @Local(argsOnly = true) CollisionView world) {
-		if (entity != null && borders.containsKey(entity.getUuid())) {
-			return borders.get(entity.getUuid()).getWorldBorder(entity.getEntityWorld());
+		BorderCache borderCache = getBorderCache(entity);
+		if (borderCache != null) {
+			return borderCache.getWorldBorder(entity.getEntityWorld());
 		}
-		// Todo: add checks for other entities with owner
 		return defaultBorder;
 	}
 }
