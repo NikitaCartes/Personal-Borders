@@ -15,14 +15,14 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(ServerWorld.class)
 public class ServerWorldMixin {
 
-	@ModifyReceiver(method = "canPlayerModifyAt(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;)Z",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
-	private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos, @Local(argsOnly = true) PlayerEntity entity) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "canPlayerModifyAt(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
+    private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos, @Local(argsOnly = true) PlayerEntity entity) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 }

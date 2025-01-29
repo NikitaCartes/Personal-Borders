@@ -18,27 +18,27 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(PortalForcer.class)
 public class PortalForcerMixin implements PortalForcerImpl {
 
-	@Unique
-	@Nullable Entity entity;
+    @Unique
+    @Nullable Entity entity;
 
-	@WrapOperation(method = "createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-	private WorldBorder sendModifiedBorder(ServerWorld instance, Operation<WorldBorder> original) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return original.call(instance);
-	}
+    @WrapOperation(method = "createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
+    private WorldBorder sendModifiedBorder(ServerWorld instance, Operation<WorldBorder> original) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return original.call(instance);
+    }
 
-	@Override
-	public void personal_Borders$setEntity(@Nullable Entity entity) {
-		this.entity = entity;
-	}
+    @Override
+    public void personal_Borders$setEntity(@Nullable Entity entity) {
+        this.entity = entity;
+    }
 
-	@Override
-	public @Nullable Entity personal_Borders$getEntity() {
-		return this.entity;
-	}
+    @Override
+    public @Nullable Entity personal_Borders$getEntity() {
+        return this.entity;
+    }
 }

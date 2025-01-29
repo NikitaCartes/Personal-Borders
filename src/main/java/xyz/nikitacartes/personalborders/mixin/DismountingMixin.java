@@ -16,14 +16,14 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 @Mixin(Dismounting.class)
 public class DismountingMixin {
 
-	@ModifyReceiver(method = "canPlaceEntityAt(Lnet/minecraft/world/CollisionView;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/math/Box;)Z",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
-	private static WorldBorder sendModifiedBorder(WorldBorder defaultBorder, Box box, @Local(argsOnly = true) LivingEntity entity, @Local(argsOnly = true) CollisionView world) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "canPlaceEntityAt(Lnet/minecraft/world/CollisionView;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/math/Box;)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
+    private static WorldBorder sendModifiedBorder(WorldBorder defaultBorder, Box box, @Local(argsOnly = true) LivingEntity entity, @Local(argsOnly = true) CollisionView world) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 }

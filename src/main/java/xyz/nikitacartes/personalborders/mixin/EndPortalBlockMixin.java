@@ -17,15 +17,15 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getModifiedSpawnP
 @Mixin(EndPortalBlock.class)
 public class EndPortalBlockMixin {
 
-	@ModifyExpressionValue(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
-	private BlockPos sendModifiedBorder(BlockPos original, @Local(argsOnly = true) ServerWorld world, @Local(argsOnly = true) Entity entity) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			WorldBorder border = borderCache.getWorldBorder(world);
-			return getModifiedSpawnPos(world, border, original);
-		}
-		return original;
-	}
+    @ModifyExpressionValue(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
+    private BlockPos sendModifiedBorder(BlockPos original, @Local(argsOnly = true) ServerWorld world, @Local(argsOnly = true) Entity entity) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            WorldBorder border = borderCache.getWorldBorder(world);
+            return getModifiedSpawnPos(world, border, original);
+        }
+        return original;
+    }
 }

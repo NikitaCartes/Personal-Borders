@@ -22,22 +22,22 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(NetherPortalBlock.class)
 public class NetherPortalBlockMixin {
 
-	@WrapOperation(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-	private WorldBorder sendModifiedBorder(ServerWorld world, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(world);
-		}
-		return original.call(world);
-	}
+    @WrapOperation(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
+    private WorldBorder sendModifiedBorder(ServerWorld world, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(world);
+        }
+        return original.call(world);
+    }
 
-	@ModifyReceiver(method = "getOrCreateExitPortalTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;ZLnet/minecraft/world/border/WorldBorder;)Lnet/minecraft/world/TeleportTarget;",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/dimension/PortalForcer;createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;"))
-	private PortalForcer sendModifiedBorder(PortalForcer portalForcer, BlockPos pos, Direction.Axis axis, @Local(argsOnly = true) Entity entity) {
-		((PortalForcerImpl) portalForcer).personal_Borders$setEntity(entity);
-		return portalForcer;
-	}
+    @ModifyReceiver(method = "getOrCreateExitPortalTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;ZLnet/minecraft/world/border/WorldBorder;)Lnet/minecraft/world/TeleportTarget;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/dimension/PortalForcer;createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;"))
+    private PortalForcer sendModifiedBorder(PortalForcer portalForcer, BlockPos pos, Direction.Axis axis, @Local(argsOnly = true) Entity entity) {
+        ((PortalForcerImpl) portalForcer).personal_Borders$setEntity(entity);
+        return portalForcer;
+    }
 }

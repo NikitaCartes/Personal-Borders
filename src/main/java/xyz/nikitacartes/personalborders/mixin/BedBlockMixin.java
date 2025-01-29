@@ -14,14 +14,14 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 @Mixin(BedBlock.class)
 public class BedBlockMixin {
 
-	@ModifyReceiver(method = "getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
-	private WorldBorder sendModifiedBorder(WorldBorder defaultBorder, BlockPos pos, ItemPlacementContext ctx) {
-		BorderCache borderCache = getBorderCache(ctx.getPlayer());
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(ctx.getWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
+    private WorldBorder sendModifiedBorder(WorldBorder defaultBorder, BlockPos pos, ItemPlacementContext ctx) {
+        BorderCache borderCache = getBorderCache(ctx.getPlayer());
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(ctx.getWorld());
+        }
+        return defaultBorder;
+    }
 }

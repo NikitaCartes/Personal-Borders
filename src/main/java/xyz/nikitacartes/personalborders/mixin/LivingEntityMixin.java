@@ -14,50 +14,50 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
-	@ModifyReceiver(method = "baseTick()V",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
-	private WorldBorder modifyContains(WorldBorder defaultBorder, Box box) {
-		LivingEntity entity = ((LivingEntity)(Object)this);
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "baseTick()V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
+    private WorldBorder modifyContains(WorldBorder defaultBorder, Box box) {
+        LivingEntity entity = ((LivingEntity)(Object)this);
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 
-	@ModifyReceiver(method = "baseTick()V",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;getDistanceInsideBorder(Lnet/minecraft/entity/Entity;)D"))
-	private WorldBorder modifyDistanceInsideBorder(WorldBorder defaultBorder, Entity entity) {
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "baseTick()V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;getDistanceInsideBorder(Lnet/minecraft/entity/Entity;)D"))
+    private WorldBorder modifyDistanceInsideBorder(WorldBorder defaultBorder, Entity entity) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 
-	@ModifyReceiver(method = "baseTick()V",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;getSafeZone()D"))
-	private WorldBorder modifySafeZone(WorldBorder defaultBorder) {
-		LivingEntity entity = ((LivingEntity)(Object)this);
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "baseTick()V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;getSafeZone()D"))
+    private WorldBorder modifySafeZone(WorldBorder defaultBorder) {
+        LivingEntity entity = ((LivingEntity)(Object)this);
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 
-	@ModifyReceiver(method = "baseTick()V",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/border/WorldBorder;getDamagePerBlock()D"))
-	private WorldBorder modifyDamagePerBlock(WorldBorder defaultBorder) {
-		LivingEntity entity = ((LivingEntity)(Object)this);
-		BorderCache borderCache = getBorderCache(entity);
-		if (borderCache != null) {
-			return borderCache.getWorldBorder(entity.getEntityWorld());
-		}
-		return defaultBorder;
-	}
+    @ModifyReceiver(method = "baseTick()V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/border/WorldBorder;getDamagePerBlock()D"))
+    private WorldBorder modifyDamagePerBlock(WorldBorder defaultBorder) {
+        LivingEntity entity = ((LivingEntity)(Object)this);
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
+        }
+        return defaultBorder;
+    }
 }
