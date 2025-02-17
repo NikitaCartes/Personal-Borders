@@ -3,11 +3,9 @@ package xyz.nikitacartes.personalborders.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.block.EntityShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.CollisionView;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,19 +29,6 @@ public interface CollisionViewMixin {
         }
         return original.call(instance);
     }
-
-    @WrapOperation(method = "getCollisionsIncludingWorldBorder(Lnet/minecraft/world/RaycastContext;)Lnet/minecraft/util/hit/BlockHitResult;",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/CollisionView;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    private WorldBorder sendModifiedBorder(CollisionView instance, Operation<WorldBorder> original, @Local(argsOnly = true) RaycastContext context) {
-        Entity entity = ((EntityShapeContext) context.shapeContext).getEntity();
-        BorderCache borderCache = getBorderCache(entity);
-        if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
-        }
-        return original.call(instance);
-    }
-
 
     @WrapOperation(method = "findClosestCollision(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/shape/VoxelShape;Lnet/minecraft/util/math/Vec3d;DDD)Ljava/util/Optional;",
             at = @At(value = "INVOKE",
