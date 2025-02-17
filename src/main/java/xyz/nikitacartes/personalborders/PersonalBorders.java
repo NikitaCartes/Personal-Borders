@@ -29,6 +29,7 @@ import xyz.nikitacartes.personalborders.utils.BorderCache;
 import java.util.*;
 
 import static xyz.nikitacartes.personalborders.utils.PersonalBordersLogger.LogDebug;
+import static xyz.nikitacartes.personalborders.utils.PersonalBordersLogger.LogInfo;
 
 public class PersonalBorders implements ModInitializer {
     public static MinecraftServer server;
@@ -60,12 +61,12 @@ public class PersonalBorders implements ModInitializer {
         }
 
         // Check time
-        LogDebug("Loading borders for all users...");
+        LogInfo("Loading borders for all users...");
         long startTime = System.currentTimeMillis();
         luckPerms.getUserManager().getUniqueUsers().join().forEach(user -> {
             borders.put(user, getOfflineBorderCache(user));
         });
-        LogDebug("Loaded borders for all users in " + (System.currentTimeMillis() - startTime) + "ms");
+        LogInfo("Loaded borders for all users in " + (System.currentTimeMillis() - startTime) + "ms");
 
 
         CachedPermissionData permissionData = defaultGroup.getCachedData().getPermissionData();

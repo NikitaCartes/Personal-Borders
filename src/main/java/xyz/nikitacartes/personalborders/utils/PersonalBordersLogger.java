@@ -35,11 +35,11 @@ public class PersonalBordersLogger {
     }
 
     public static void LogDebug(String message) {
-        log(Level.INFO, "[DEBUG]: " + message);
+        log(Level.DEBUG, message);
     }
 
     public static void LogDebug(String message, Throwable e) {
-        log(Level.INFO, "[DEBUG]: " + message, e);
+        log(Level.DEBUG, message, e);
     }
 
     public static void LogError(String message) {

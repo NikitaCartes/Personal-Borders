@@ -1,3 +1,9 @@
+### 1.0.0
+##### Minecraft 1.21.1
+
+1) Add icon for mod
+2) Clean logs
+
 ### 0.6.0
 ##### Minecraft 1.21.1
 
