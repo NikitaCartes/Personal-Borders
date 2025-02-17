@@ -24,4 +24,8 @@ Parameters of the border are stored in the permission node as context values tha
 Example:
 ![luckperms.png](luckperms.png)
 
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/personal-borders), [Modrinth](https://modrinth.com/mod/personal-borders)
+
+[Discord](https://discord.gg/UY4nhvUzaK)
+
 This mod requires [Fabric API](https://modrinth.com/mod/fabric-api) and [LuckPerms](https://modrinth.com/plugin/luckperms) to be installed on the server.
