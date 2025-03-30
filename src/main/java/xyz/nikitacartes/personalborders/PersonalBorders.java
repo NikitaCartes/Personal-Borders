@@ -203,11 +203,17 @@ public class PersonalBorders implements ModInitializer {
         }
 
         if (entity instanceof HorseEntity horseEntity) {
-            return horseEntity.getOwnerUuid();
+            if (horseEntity.getOwnerReference() == null) {
+                return null;
+            }
+            return horseEntity.getOwnerReference().getUuid();
         }
 
         if (entity instanceof Tameable tameable) {
-            return tameable.getOwnerUuid();
+            if (tameable.getOwnerReference() == null) {
+                return null;
+            }
+            return tameable.getOwnerReference().getUuid();
         }
 
         return null;
