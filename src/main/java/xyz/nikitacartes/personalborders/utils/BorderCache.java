@@ -52,15 +52,15 @@ public class BorderCache {
     }
 
     public void sendBorder(ServerPlayerEntity player) {
-        if (player.getServerWorld().getRegistryKey().equals(World.OVERWORLD)) {
+        if (player.getWorld().getRegistryKey().equals(World.OVERWORLD)) {
             sendOverworldBorder(player.networkHandler);
             LogDebug("Sent overworld border to " + player.getNameForScoreboard());
             LogDebug("{x: " + this.overworldBorder.getCenterX() + ", z: " + this.overworldBorder.getCenterZ() + ", distance: " + this.overworldBorder.getSize() + "}");
-        } else if (player.getServerWorld().getRegistryKey().equals(World.NETHER)) {
+        } else if (player.getWorld().getRegistryKey().equals(World.NETHER)) {
             sendNetherBorder(player.networkHandler);
             LogDebug("Sent nether border to " + player.getNameForScoreboard());
             LogDebug("{x: " + this.netherBorder.getCenterX() + ", z: " + this.netherBorder.getCenterZ() + ", distance: " + this.netherBorder.getSize() + "}");
-        } else if (player.getServerWorld().getRegistryKey().equals(World.END)) {
+        } else if (player.getWorld().getRegistryKey().equals(World.END)) {
             sendEndBorder(player.networkHandler);
             LogDebug("Sent end border to " + player.getNameForScoreboard());
             LogDebug("{x: " + this.endBorder.getCenterX() + ", z: " + this.endBorder.getCenterZ() + ", distance: " + this.endBorder.getSize() + "}");

@@ -23,7 +23,7 @@ public class ServerWorldMixin {
     private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos, @Local(argsOnly = true) Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.getWorld());
         }
         return defaultBorder;
     }
@@ -34,7 +34,7 @@ public class ServerWorldMixin {
         if (original && !(entity instanceof PlayerEntity)) {
             BorderCache borderCache = getBorderCache(entity);
             if (borderCache != null) {
-                return borderCache.getWorldBorder(entity.getEntityWorld()) .contains(pos);
+                return borderCache.getWorldBorder(entity.getWorld()) .contains(pos);
             }
         }
         return original;

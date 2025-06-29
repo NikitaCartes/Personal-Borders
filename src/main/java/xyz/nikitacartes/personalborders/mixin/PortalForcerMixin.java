@@ -27,7 +27,7 @@ public class PortalForcerMixin implements PortalForcerImpl {
     private WorldBorder sendModifiedBorder(ServerWorld instance, Operation<WorldBorder> original) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.getWorld());
         }
         return original.call(instance);
     }

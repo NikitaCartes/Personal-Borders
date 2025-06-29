@@ -22,7 +22,7 @@ public class DismountingMixin {
     private static WorldBorder sendModifiedBorder(WorldBorder defaultBorder, Box box, @Local(argsOnly = true) LivingEntity entity, @Local(argsOnly = true) CollisionView world) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.getWorld());
         }
         return defaultBorder;
     }

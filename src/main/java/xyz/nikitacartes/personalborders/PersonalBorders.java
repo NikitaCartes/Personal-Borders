@@ -199,7 +199,10 @@ public class PersonalBorders implements ModInitializer {
         }
 
         if (entity instanceof ProjectileEntity projectileEntity) {
-            return projectileEntity.ownerUuid;
+            if (projectileEntity.owner == null) {
+                return null;
+            }
+            return projectileEntity.owner.getUuid();
         }
 
         if (entity instanceof HorseEntity horseEntity) {
