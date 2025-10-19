@@ -1,27 +1,22 @@
 package xyz.nikitacartes.personalborders.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReceiver;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import xyz.nikitacartes.personalborders.utils.BorderCache;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xyz.nikitacartes.personalborders.imlp.EntityAdderImpl;
 
-import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
 
-    @ModifyReceiver(method = "getWorldSpawnPos(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/BlockPos;",
+    @Inject(method = "getWorldSpawnPos(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/BlockPos;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/border/WorldBorder;getDistanceInsideBorder(DD)D"))
-    private WorldBorder modifyContains(WorldBorder defaultBorder, double x, double z) {
-        LivingEntity entity = ((LivingEntity)(Object)this);
-        BorderCache borderCache = getOfflineBorderCache(entity.getUuid());
-        if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
-        }
-        return defaultBorder;
+                    target = "Lnet/minecraft/server/network/SpawnLocating;locateSpawnPos(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Ljava/util/concurrent/CompletableFuture;"))
+    private void sendModifiedBorder(ServerWorld world, BlockPos basePos, CallbackInfoReturnable<BlockPos> cir) {
+        ((EntityAdderImpl) world).personal_Borders$setEntity((ServerPlayerEntity) (Object) this);
     }
 }

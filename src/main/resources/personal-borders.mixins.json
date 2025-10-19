@@ -12,9 +12,11 @@
     "NetherPortalBlockMixin",
     "PlayerManagerMixin",
     "PortalForcerMixin",
+    "PrepareSpawnTaskMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
     "ServerWorldMixin",
+    "SpawnLocatingMixin",
     "TeleportTargetMixin"
   ],
   "injectors": {

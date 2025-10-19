@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -18,8 +18,14 @@ repositories {
 }
 
 loom {
+    splitEnvironmentSourceSets()
+    mods {
+        "personal-borders" {
+            sourceSet sourceSets.main
+        }
+    }
+
 	accessWidenerPath = file("src/main/resources/personal-borders.accesswidener")
-	serverOnlyMinecraftJar()
 }
 
 dependencies {

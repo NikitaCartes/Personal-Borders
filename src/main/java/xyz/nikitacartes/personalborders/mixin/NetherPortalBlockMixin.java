@@ -13,7 +13,7 @@ import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.PortalForcer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import xyz.nikitacartes.personalborders.imlp.PortalForcerImpl;
+import xyz.nikitacartes.personalborders.imlp.EntityAdderImpl;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
 
 import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
@@ -37,7 +37,7 @@ public class NetherPortalBlockMixin {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/dimension/PortalForcer;createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;"))
     private PortalForcer sendModifiedBorder(PortalForcer portalForcer, BlockPos pos, Direction.Axis axis, @Local(argsOnly = true) Entity entity) {
-        ((PortalForcerImpl) portalForcer).personal_Borders$setEntity(entity);
+        ((EntityAdderImpl) portalForcer).personal_Borders$setEntity(entity);
         return portalForcer;
     }
 }

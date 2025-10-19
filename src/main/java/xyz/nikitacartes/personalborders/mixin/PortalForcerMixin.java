@@ -10,13 +10,13 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import xyz.nikitacartes.personalborders.imlp.PortalForcerImpl;
+import xyz.nikitacartes.personalborders.imlp.EntityAdderImpl;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
 
 import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 
 @Mixin(PortalForcer.class)
-public class PortalForcerMixin implements PortalForcerImpl {
+public class PortalForcerMixin implements EntityAdderImpl {
 
     @Unique
     @Nullable Entity entity;
@@ -26,8 +26,8 @@ public class PortalForcerMixin implements PortalForcerImpl {
                     target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
     private WorldBorder sendModifiedBorder(ServerWorld instance, Operation<WorldBorder> original) {
         BorderCache borderCache = getBorderCache(entity);
-        if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+        if (borderCache != null && entity != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return original.call(instance);
     }

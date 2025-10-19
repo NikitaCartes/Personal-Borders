@@ -7,7 +7,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderListener;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,38 +52,26 @@ public class PlayerManagerMixin {
         // do nothing and don't call original
     }
 
-    @ModifyExpressionValue(method = "onPlayerConnect(Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/network/ConnectedClientData;)V",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
-    private static BlockPos sendModifiedSpawnPosition(BlockPos original, @Local(argsOnly = true) ServerPlayerEntity player) {
-        BorderCache borderCache = getOfflineBorderCache(player.getUuid());
-        if (borderCache != null) {
-            WorldBorder border = borderCache.getWorldBorder(player.getWorld());
-            return getModifiedSpawnPos(player.getWorld(), border, original);
-        }
-        return original;
-    }
-
     @ModifyExpressionValue(method = "sendWorldInfo(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/world/ServerWorld;)V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
-    private static BlockPos sendModifiedWorldInfo(BlockPos original, @Local(argsOnly = true) ServerPlayerEntity player, @Local(argsOnly = true) ServerWorld world) {
+                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPoint()Lnet/minecraft/world/WorldProperties$SpawnPoint;"))
+    private static WorldProperties.SpawnPoint sendModifiedWorldInfo(WorldProperties.SpawnPoint original, @Local(argsOnly = true) ServerPlayerEntity player, @Local(argsOnly = true) ServerWorld world) {
         BorderCache borderCache = getOfflineBorderCache(player.getUuid());
         if (borderCache != null) {
             WorldBorder border = borderCache.getWorldBorder(world);
-            return getModifiedSpawnPos(world, border, original);
+            return getModifiedSpawnPoint(world, border, original);
         }
         return original;
     }
 
     @ModifyExpressionValue(method = "respawnPlayer(Lnet/minecraft/server/network/ServerPlayerEntity;ZLnet/minecraft/entity/Entity$RemovalReason;)Lnet/minecraft/server/network/ServerPlayerEntity;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPos()Lnet/minecraft/util/math/BlockPos;"))
-    private static BlockPos sendModifiedRespawnPosition(BlockPos original, @Local(argsOnly = true) ServerPlayerEntity player, @Local(ordinal = 0) ServerWorld serverWorld) {
+                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPoint()Lnet/minecraft/world/WorldProperties$SpawnPoint;"))
+    private static WorldProperties.SpawnPoint sendModifiedRespawnPosition(WorldProperties.SpawnPoint original, @Local(argsOnly = true) ServerPlayerEntity player, @Local(ordinal = 0) ServerWorld serverWorld) {
         BorderCache borderCache = getOfflineBorderCache(player.getUuid());
         if (borderCache != null) {
             WorldBorder border = borderCache.getWorldBorder(serverWorld);
-            return getModifiedSpawnPos(serverWorld, border, original);
+            return getModifiedSpawnPoint(serverWorld, border, original);
         }
         return original;
     }

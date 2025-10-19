@@ -20,8 +20,10 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.border.WorldBorder;
 import xyz.nikitacartes.personalborders.listener.LuckPermsListener;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
@@ -241,9 +243,10 @@ public class PersonalBorders implements ModInitializer {
         return null;
     }
 
-    public static BlockPos getModifiedSpawnPos(World world, WorldBorder worldBorder, BlockPos originalSpawnPos) {
-        if (!worldBorder.contains(originalSpawnPos)) {
-            return world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
+    public static WorldProperties.SpawnPoint getModifiedSpawnPoint(World world, WorldBorder worldBorder, WorldProperties.SpawnPoint originalSpawnPos) {
+        if (!worldBorder.contains(originalSpawnPos.getPos())) {
+            BlockPos newBlockPos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
+            return new WorldProperties.SpawnPoint(new GlobalPos(world.getRegistryKey(), newBlockPos), originalSpawnPos.pitch(), originalSpawnPos.yaw());
         }
 
         return originalSpawnPos;

@@ -27,7 +27,7 @@ public interface CollisionViewMixin {
     private WorldBorder sendModifiedBorder(CollisionView instance, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return original.call(instance);
     }
@@ -38,8 +38,8 @@ public interface CollisionViewMixin {
     private WorldBorder sendModifiedBorder(CollisionView instance, Operation<WorldBorder> original, @Local(argsOnly = true) RaycastContext context) {
         Entity entity = ((EntityShapeContext) context.shapeContext).getEntity();
         BorderCache borderCache = getBorderCache(entity);
-        if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+        if (borderCache != null && entity != null) {
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return original.call(instance);
     }
@@ -52,7 +52,7 @@ public interface CollisionViewMixin {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
             Predicate newPredicate = voxelShape -> borderCache
-                    .getWorldBorder(entity.getWorld())
+                    .getWorldBorder(entity.getEntityWorld())
                     .contains(((VoxelShape)voxelShape).getBoundingBox());
             return original.call(instance, newPredicate);
         }

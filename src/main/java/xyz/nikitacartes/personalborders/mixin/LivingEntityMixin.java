@@ -21,7 +21,7 @@ public class LivingEntityMixin {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return defaultBorder;
     }
@@ -32,7 +32,7 @@ public class LivingEntityMixin {
     private WorldBorder modifyDistanceInsideBorder(WorldBorder defaultBorder, Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return defaultBorder;
     }
@@ -44,7 +44,7 @@ public class LivingEntityMixin {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return defaultBorder;
     }
@@ -56,7 +56,7 @@ public class LivingEntityMixin {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getWorld());
+            return borderCache.getWorldBorder(entity.getEntityWorld());
         }
         return defaultBorder;
     }
