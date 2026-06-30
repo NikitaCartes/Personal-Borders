@@ -1,11 +1,11 @@
 package xyz.nikitacartes.personalborders.utils;
 
 import net.luckperms.api.node.Node;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class BorderCache {
     private final WorldBorder endBorder;
 
     public BorderCache(Node defaultBorderNote, Node overworldBorderNode, Node netherBorderNode, Node endBorderNode) {
-        WorldBorder defaultBorder = getBorderFromNode(defaultBorderNote, server.getOverworld().getWorldBorder(), 1);
+        WorldBorder defaultBorder = getBorderFromNode(defaultBorderNote, server.overworld().getWorldBorder(), 1);
 
         this.overworldBorder = getBorderFromNode(overworldBorderNode, defaultBorder, 1);
         this.netherBorder = getBorderFromNode(netherBorderNode, defaultBorder, 8);
@@ -39,30 +39,30 @@ public class BorderCache {
         return this.endBorder;
     }
 
-    public void sendOverworldBorder(ServerPlayNetworkHandler netHandler) {
-        netHandler.sendPacket(new WorldBorderInitializeS2CPacket(this.overworldBorder));
+    public void sendOverworldBorder(ServerGamePacketListenerImpl netHandler) {
+        netHandler.send(new ClientboundInitializeBorderPacket(this.overworldBorder));
     }
 
-    public void sendNetherBorder(ServerPlayNetworkHandler netHandler) {
-        netHandler.sendPacket(new WorldBorderInitializeS2CPacket(this.netherBorder));
+    public void sendNetherBorder(ServerGamePacketListenerImpl netHandler) {
+        netHandler.send(new ClientboundInitializeBorderPacket(this.netherBorder));
     }
 
-    public void sendEndBorder(ServerPlayNetworkHandler netHandler) {
-        netHandler.sendPacket(new WorldBorderInitializeS2CPacket(this.endBorder));
+    public void sendEndBorder(ServerGamePacketListenerImpl netHandler) {
+        netHandler.send(new ClientboundInitializeBorderPacket(this.endBorder));
     }
 
-    public void sendBorder(ServerPlayerEntity player) {
-        if (player.getEntityWorld().getRegistryKey().equals(World.OVERWORLD)) {
-            sendOverworldBorder(player.networkHandler);
-            LogDebug("Sent overworld border to " + player.getNameForScoreboard());
+    public void sendBorder(ServerPlayer player) {
+        if (player.level().dimension().equals(Level.OVERWORLD)) {
+            sendOverworldBorder(player.connection);
+            LogDebug("Sent overworld border to " + player.getScoreboardName());
             LogDebug("{x: " + this.overworldBorder.getCenterX() + ", z: " + this.overworldBorder.getCenterZ() + ", distance: " + this.overworldBorder.getSize() + "}");
-        } else if (player.getEntityWorld().getRegistryKey().equals(World.NETHER)) {
-            sendNetherBorder(player.networkHandler);
-            LogDebug("Sent nether border to " + player.getNameForScoreboard());
+        } else if (player.level().dimension().equals(Level.NETHER)) {
+            sendNetherBorder(player.connection);
+            LogDebug("Sent nether border to " + player.getScoreboardName());
             LogDebug("{x: " + this.netherBorder.getCenterX() + ", z: " + this.netherBorder.getCenterZ() + ", distance: " + this.netherBorder.getSize() + "}");
-        } else if (player.getEntityWorld().getRegistryKey().equals(World.END)) {
-            sendEndBorder(player.networkHandler);
-            LogDebug("Sent end border to " + player.getNameForScoreboard());
+        } else if (player.level().dimension().equals(Level.END)) {
+            sendEndBorder(player.connection);
+            LogDebug("Sent end border to " + player.getScoreboardName());
             LogDebug("{x: " + this.endBorder.getCenterX() + ", z: " + this.endBorder.getCenterZ() + ", distance: " + this.endBorder.getSize() + "}");
         }
     }
@@ -92,17 +92,17 @@ public class BorderCache {
         border.setWarningBlocks(warningBlocks);
         border.setWarningTime(warningTime);
         border.setSize(distance);
-        border.setMaxRadius(server.getMaxWorldBorderRadius());
+        border.setAbsoluteMaxSize(server.getAbsoluteMaxWorldSize());
 
         return border;
     }
 
-    public WorldBorder getWorldBorder(World world) {
-        if (world.getRegistryKey().equals(World.OVERWORLD)) {
+    public WorldBorder getWorldBorder(Level world) {
+        if (world.dimension().equals(Level.OVERWORLD)) {
             return this.overworldBorder;
-        } else if (world.getRegistryKey().equals(World.NETHER)) {
+        } else if (world.dimension().equals(Level.NETHER)) {
             return this.netherBorder;
-        } else if (world.getRegistryKey().equals(World.END)) {
+        } else if (world.dimension().equals(Level.END)) {
             return this.endBorder;
         }
         return world.getWorldBorder();

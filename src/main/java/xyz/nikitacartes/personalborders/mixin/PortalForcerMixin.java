@@ -2,10 +2,10 @@ package xyz.nikitacartes.personalborders.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.PortalForcer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.PortalForcer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,13 +21,13 @@ public class PortalForcerMixin implements EntityAdderImpl {
     @Unique
     @Nullable Entity entity;
 
-    @WrapOperation(method = "createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;",
+    @WrapOperation(method = "createPortal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;)Ljava/util/Optional;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    private WorldBorder sendModifiedBorder(ServerWorld instance, Operation<WorldBorder> original) {
+                    target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    private WorldBorder sendModifiedBorder(ServerLevel instance, Operation<WorldBorder> original) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null && entity != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.level());
         }
         return original.call(instance);
     }

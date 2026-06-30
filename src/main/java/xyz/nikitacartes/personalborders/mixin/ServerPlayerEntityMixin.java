@@ -1,8 +1,8 @@
 package xyz.nikitacartes.personalborders.mixin;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,13 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.nikitacartes.personalborders.imlp.EntityAdderImpl;
 
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(ServerPlayer.class)
 public class ServerPlayerEntityMixin {
 
-    @Inject(method = "getWorldSpawnPos(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/BlockPos;",
+    @Inject(method = "adjustSpawnLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/core/BlockPos;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/SpawnLocating;locateSpawnPos(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Ljava/util/concurrent/CompletableFuture;"))
-    private void sendModifiedBorder(ServerWorld world, BlockPos basePos, CallbackInfoReturnable<BlockPos> cir) {
-        ((EntityAdderImpl) world).personal_Borders$setEntity((ServerPlayerEntity) (Object) this);
+                    target = "Lnet/minecraft/server/level/PlayerSpawnFinder;findSpawn(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;)Ljava/util/concurrent/CompletableFuture;"))
+    private void sendModifiedBorder(ServerLevel world, BlockPos basePos, CallbackInfoReturnable<BlockPos> cir) {
+        ((EntityAdderImpl) world).personal_Borders$setEntity((ServerPlayer) (Object) this);
     }
 }

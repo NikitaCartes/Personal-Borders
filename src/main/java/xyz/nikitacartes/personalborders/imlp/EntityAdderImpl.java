@@ -1,6 +1,6 @@
 package xyz.nikitacartes.personalborders.imlp;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public interface EntityAdderImpl {
 

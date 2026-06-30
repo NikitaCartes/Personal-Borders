@@ -1,10 +1,10 @@
 package xyz.nikitacartes.personalborders.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
@@ -16,47 +16,47 @@ public class LivingEntityMixin {
 
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/Box;)Z"))
-    private WorldBorder modifyContains(WorldBorder defaultBorder, Box box) {
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/world/phys/AABB;)Z"))
+    private WorldBorder modifyContains(WorldBorder defaultBorder, AABB box) {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.level());
         }
         return defaultBorder;
     }
 
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/border/WorldBorder;getDistanceInsideBorder(Lnet/minecraft/entity/Entity;)D"))
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;getDistanceToBorder(Lnet/minecraft/world/entity/Entity;)D"))
     private WorldBorder modifyDistanceInsideBorder(WorldBorder defaultBorder, Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.level());
         }
         return defaultBorder;
     }
 
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/border/WorldBorder;getSafeZone()D"))
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;getSafeZone()D"))
     private WorldBorder modifySafeZone(WorldBorder defaultBorder) {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.level());
         }
         return defaultBorder;
     }
 
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/border/WorldBorder;getDamagePerBlock()D"))
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;getDamagePerBlock()D"))
     private WorldBorder modifyDamagePerBlock(WorldBorder defaultBorder) {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
-            return borderCache.getWorldBorder(entity.getEntityWorld());
+            return borderCache.getWorldBorder(entity.level());
         }
         return defaultBorder;
     }

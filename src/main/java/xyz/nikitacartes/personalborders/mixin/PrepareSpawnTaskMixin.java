@@ -2,11 +2,11 @@ package xyz.nikitacartes.personalborders.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerConfigEntry;
-import net.minecraft.server.network.PrepareSpawnTask;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.network.config.PrepareSpawnTask;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,21 +22,21 @@ public class PrepareSpawnTaskMixin {
 
     @Final
     @Shadow
-    PlayerConfigEntry player;
+    NameAndId nameAndId;
 
     @Final
     @Shadow
     MinecraftServer server;
 
-    @ModifyExpressionValue(method = "sendPacket(Ljava/util/function/Consumer;)V",
+    @ModifyExpressionValue(method = "start",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/ServerWorldProperties;getSpawnPoint()Lnet/minecraft/world/WorldProperties$SpawnPoint;"))
-    private WorldProperties.SpawnPoint sendModifiedBorder(WorldProperties.SpawnPoint original) {
-        BorderCache borderCache = getOfflineBorderCache(player.id());
+                    target = "Lnet/minecraft/world/level/storage/ServerLevelData;getRespawnData()Lnet/minecraft/world/level/storage/LevelData$RespawnData;"))
+    private LevelData.RespawnData sendModifiedBorder(LevelData.RespawnData original) {
+        BorderCache borderCache = getOfflineBorderCache(nameAndId.id());
         if (borderCache != null) {
-            ServerWorld world = server.getWorld(original.getDimension());
+            ServerLevel world = server.getLevel(original.globalPos().dimension());
             if (world == null) {
-                world = server.getOverworld();
+                world = server.overworld();
             }
             WorldBorder border = borderCache.getWorldBorder(world);
             return getModifiedSpawnPoint(world, border, original);

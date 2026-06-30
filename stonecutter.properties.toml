@@ -1,0 +1,39 @@
+# Central Stonecutter properties for Personal Borders.
+# Top-level keys apply to every node; [<loader>."<version>"] sections apply to that node only.
+# Build scripts read these via property("...") after calling properties.tags(version, loader).
+
+# Mod
+mod_name = "Personal Borders"
+mod_id = "personal-borders"
+mod_version = "1.0.0"
+
+# Each node is compiled against 26.1 and declared compatible up through 26.2.
+#   loader / fabric-api  https://fabricmc.net/develop/
+#   neoforge_version     https://projects.neoforged.net/neoforged/neoforge
+#   luckperms            https://luckperms.net/ (API is decoupled from the MC version)
+
+[fabric."26.1"]
+minecraft_version = "26.1"
+loader_version = "0.19.3"
+fabric_version = "0.144.3+26.1"
+luckperms_version = "5.5"
+supported_minecraft_version = ">=26.1- <26.2"
+
+[fabric."26.2"]
+minecraft_version = "26.2"
+loader_version = "0.19.3"
+fabric_version = "0.152.2+26.2"
+luckperms_version = "5.5"
+supported_minecraft_version = ">=26.2-"
+
+[neoforge."26.1"]
+minecraft_version = "26.1"
+neoforge_version = "26.1.2.75"
+luckperms_version = "5.5"
+supported_minecraft_version = "[26.1,26.2)"
+
+[neoforge."26.2"]
+minecraft_version = "26.2"
+neoforge_version = "26.2.0.7-beta"
+luckperms_version = "5.5"
+supported_minecraft_version = "[26.2,)"

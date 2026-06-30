@@ -1,8 +1,12 @@
 ### 1.0.0
-##### Minecraft 1.21.1, 1.21.2-1.21.4, 1.21.5, 1.21.6-1.21.8, 1.21.9-1.21.10, 1.21.11
+##### Minecraft 26.1, 26.2 — Fabric & NeoForge
 
-1) Add icon for mod
-2) Clean logs
+1) Migrate to a Stonecutter multiloader project on a single Mojang-mapped source tree
+2) Add NeoForge support
+3) Add icon for mod
+4) Clean logs
+
+Pre-26.1 targets remain on their per-version branches (1.21.1 … 1.21.11).
 
 ### 0.6.0
 ##### Minecraft 1.21.1

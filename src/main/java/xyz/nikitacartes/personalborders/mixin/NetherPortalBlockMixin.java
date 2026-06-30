@@ -4,13 +4,13 @@ import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.PortalForcer;
+import net.minecraft.world.level.block.NetherPortalBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.portal.PortalForcer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.nikitacartes.personalborders.imlp.EntityAdderImpl;
@@ -22,10 +22,10 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(NetherPortalBlock.class)
 public class NetherPortalBlockMixin {
 
-    @WrapOperation(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
+    @WrapOperation(method = "getPortalDestination(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/portal/TeleportTransition;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    private WorldBorder sendModifiedBorder(ServerWorld world, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
+                    target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    private WorldBorder sendModifiedBorder(ServerLevel world, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
             return borderCache.getWorldBorder(world);
@@ -33,9 +33,9 @@ public class NetherPortalBlockMixin {
         return original.call(world);
     }
 
-    @ModifyReceiver(method = "getOrCreateExitPortalTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;ZLnet/minecraft/world/border/WorldBorder;)Lnet/minecraft/world/TeleportTarget;",
+    @ModifyReceiver(method = "getExitPortal(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/level/border/WorldBorder;)Lnet/minecraft/world/level/portal/TeleportTransition;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/dimension/PortalForcer;createPortal(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction$Axis;)Ljava/util/Optional;"))
+                    target = "Lnet/minecraft/world/level/portal/PortalForcer;createPortal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;)Ljava/util/Optional;"))
     private PortalForcer sendModifiedBorder(PortalForcer portalForcer, BlockPos pos, Direction.Axis axis, @Local(argsOnly = true) Entity entity) {
         ((EntityAdderImpl) portalForcer).personal_Borders$setEntity(entity);
         return portalForcer;

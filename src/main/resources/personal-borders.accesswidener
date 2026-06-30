@@ -1,4 +1,0 @@
-accessWidener	v1	named
-
-accessible field net/minecraft/entity/projectile/ProjectileEntity owner Lnet/minecraft/entity/LazyEntityReference;
-accessible field net/minecraft/world/RaycastContext shapeContext Lnet/minecraft/block/ShapeContext;

@@ -1,0 +1,4 @@
+accessWidener	v1	official
+
+accessible	field	net/minecraft/world/entity/projectile/Projectile	owner	Lnet/minecraft/world/entity/EntityReference;
+accessible	field	net/minecraft/world/level/ClipContext	collisionContext	Lnet/minecraft/world/phys/shapes/CollisionContext;

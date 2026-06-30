@@ -2,11 +2,11 @@ package xyz.nikitacartes.personalborders.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.block.EndPortalBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.level.block.EndPortalBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
@@ -17,10 +17,10 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getModifiedSpawnP
 @Mixin(EndPortalBlock.class)
 public class EndPortalBlockMixin {
 
-    @ModifyExpressionValue(method = "createTeleportTarget(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/world/TeleportTarget;",
+    @ModifyExpressionValue(method = "getPortalDestination(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/portal/TeleportTransition;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ServerWorld;getSpawnPoint()Lnet/minecraft/world/WorldProperties$SpawnPoint;"))
-    private WorldProperties.SpawnPoint sendModifiedBorder(WorldProperties.SpawnPoint original, @Local(argsOnly = true) ServerWorld world, @Local(argsOnly = true) Entity entity) {
+                    target = "Lnet/minecraft/server/level/ServerLevel;getRespawnData()Lnet/minecraft/world/level/storage/LevelData$RespawnData;"))
+    private LevelData.RespawnData sendModifiedBorder(LevelData.RespawnData original, @Local(argsOnly = true) ServerLevel world, @Local(argsOnly = true) Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
             WorldBorder border = borderCache.getWorldBorder(world);

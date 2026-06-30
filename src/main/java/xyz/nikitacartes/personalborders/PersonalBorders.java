@@ -1,9 +1,14 @@
 package xyz.nikitacartes.personalborders;
 
+//? if fabric {
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+//?} else {
+/*import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+*///?}
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedPermissionData;
@@ -12,19 +17,18 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.query.QueryOptions;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.Tameable;
-import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.border.WorldBorder;
 import xyz.nikitacartes.personalborders.listener.LuckPermsListener;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
 
@@ -33,7 +37,12 @@ import java.util.*;
 import static xyz.nikitacartes.personalborders.utils.PersonalBordersLogger.LogDebug;
 import static xyz.nikitacartes.personalborders.utils.PersonalBordersLogger.LogInfo;
 
+//? if fabric {
 public class PersonalBorders implements ModInitializer {
+//?} else {
+/*@net.neoforged.fml.common.Mod("personal-borders")
+public class PersonalBorders {
+*///?}
     public static MinecraftServer server;
     public static LuckPerms luckPerms;
 
@@ -43,13 +52,20 @@ public class PersonalBorders implements ModInitializer {
     // Teleport player nether portal: outside of border, or inside border
     // Teleport players in entity: together, or separate
 
+    //? if fabric {
     @Override
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onStartServer);
 
-        ServerPlayConnectionEvents.JOIN.register((netHandler, packetSender, server) -> onPlayerJoin(netHandler.getPlayer().getUuid()));
-        // ServerPlayConnectionEvents.DISCONNECT.register((netHandler, server) -> borders.remove(netHandler.getPlayer().getUuid()));
+        ServerPlayConnectionEvents.JOIN.register((netHandler, packetSender, server) -> onPlayerJoin(netHandler.getPlayer().getUUID()));
+        // ServerPlayConnectionEvents.DISCONNECT.register((netHandler, server) -> borders.remove(netHandler.getPlayer().getUUID()));
     }
+    //?} else {
+    /*public PersonalBorders() {
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> onStartServer(event.getServer()));
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> onPlayerJoin(event.getEntity().getUUID()));
+    }
+    *///?}
 
     private void onStartServer(MinecraftServer server) {
         PersonalBorders.server = server;
@@ -82,7 +98,7 @@ public class PersonalBorders implements ModInitializer {
             return;
         }
 
-        WorldBorder defaultBorder = PersonalBorders.server.getOverworld().getWorldBorder();
+        WorldBorder defaultBorder = PersonalBorders.server.overworld().getWorldBorder();
 
         NodeMap data = defaultGroup.data();
         data.add(createNode("personal-borders", defaultBorder));
@@ -104,7 +120,7 @@ public class PersonalBorders implements ModInitializer {
     }
 
     public static void updateForPlayer(UUID uuid) {
-        ServerPlayerEntity player = PersonalBorders.server.getPlayerManager().getPlayer(uuid);
+        ServerPlayer player = PersonalBorders.server.getPlayerList().getPlayer(uuid);
         if (player == null) {
             return; // Player not online.
         }
@@ -112,7 +128,7 @@ public class PersonalBorders implements ModInitializer {
         if (user == null) {
             return;
         }
-        LogDebug("Updating border for player: " + player.getNameForScoreboard());
+        LogDebug("Updating border for player: " + player.getScoreboardName());
 
         BorderCache borderCache = getBorderCache(user.resolveInheritedNodes(QueryOptions.nonContextual()));
         borders.put(uuid, borderCache);
@@ -191,8 +207,8 @@ public class PersonalBorders implements ModInitializer {
             return null;
         }
 
-        if (entity instanceof PlayerEntity) {
-            return entity.getUuid();
+        if (entity instanceof Player) {
+            return entity.getUUID();
         }
 
         UUID uuid = getPlayerPassengerUUID(entity);
@@ -200,38 +216,31 @@ public class PersonalBorders implements ModInitializer {
             return uuid;
         }
 
-        if (entity instanceof ProjectileEntity projectileEntity) {
+        if (entity instanceof Projectile projectileEntity) {
             if (projectileEntity.owner == null) {
                 return null;
             }
-            return projectileEntity.owner.getUuid();
+            return projectileEntity.owner.getUUID();
         }
 
-        if (entity instanceof HorseEntity horseEntity) {
-            if (horseEntity.getOwnerReference() == null) {
-                return null;
-            }
-            return horseEntity.getOwnerReference().getUuid();
-        }
-
-        if (entity instanceof Tameable tameable) {
+        if (entity instanceof OwnableEntity tameable) {
             if (tameable.getOwnerReference() == null) {
                 return null;
             }
-            return tameable.getOwnerReference().getUuid();
+            return tameable.getOwnerReference().getUUID();
         }
 
         return null;
     }
 
     private static UUID getPlayerPassengerUUID(Entity entity) {
-        if (!entity.hasPassengers()) {
+        if (!entity.isVehicle()) {
             return null;
         }
 
-        for (Entity passenger : entity.getPassengerList()) {
-            if (passenger instanceof PlayerEntity) {
-                return passenger.getUuid();
+        for (Entity passenger : entity.getPassengers()) {
+            if (passenger instanceof Player) {
+                return passenger.getUUID();
             }
 
             UUID uuid = getPlayerPassengerUUID(passenger);
@@ -243,10 +252,10 @@ public class PersonalBorders implements ModInitializer {
         return null;
     }
 
-    public static WorldProperties.SpawnPoint getModifiedSpawnPoint(World world, WorldBorder worldBorder, WorldProperties.SpawnPoint originalSpawnPos) {
-        if (!worldBorder.contains(originalSpawnPos.getPos())) {
-            BlockPos newBlockPos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
-            return new WorldProperties.SpawnPoint(new GlobalPos(world.getRegistryKey(), newBlockPos), originalSpawnPos.pitch(), originalSpawnPos.yaw());
+    public static LevelData.RespawnData getModifiedSpawnPoint(Level world, WorldBorder worldBorder, LevelData.RespawnData originalSpawnPos) {
+        if (!worldBorder.isWithinBounds(originalSpawnPos.pos())) {
+            BlockPos newBlockPos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, BlockPos.containing(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
+            return new LevelData.RespawnData(new GlobalPos(world.dimension(), newBlockPos), originalSpawnPos.yaw(), originalSpawnPos.pitch());
         }
 
         return originalSpawnPos;
