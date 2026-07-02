@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 }
 
 // Tag this node's loader and version so [fabric."26.1"] keys resolve via bare property("...").
@@ -67,4 +68,39 @@ tasks.register<Copy>("collectJars") {
     from(tasks.jar.map { it.archiveFile })
     into(rootProject.layout.buildDirectory.dir("libs"))
     dependsOn("build")
+}
+
+publishMods {
+    val modrinthToken = System.getenv("MODRINTH_TOKEN") ?: ""
+    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN") ?: ""
+    val githubToken = System.getenv("GITHUB_TOKEN") ?: ""
+
+    file = tasks.jar.get().archiveFile
+    dryRun = modrinthToken.isEmpty() || curseforgeToken.isEmpty() || githubToken.isEmpty()
+    displayName = "${property("display_name")} ${project.version}"
+    version = project.version.toString()
+    changelog = rootProject.file("RELEASE_NOTE.md").readText()
+    type = STABLE
+    modLoaders.add("fabric")
+
+    val targets = property("supported_versions").toString().split(",")
+    modrinth {
+        projectId = "JlLlrYIT"
+        accessToken = modrinthToken
+        targets.forEach(minecraftVersions::add)
+        requires("fabric-api")
+        optional("luckperms")
+    }
+    curseforge {
+        projectId = "1202751"
+        accessToken = curseforgeToken
+        targets.forEach(minecraftVersions::add)
+        requires("fabric-api")
+        optional("luckperms")
+    }
+    // Uploads this node's jar into the single release created by the root publishGithub task.
+    github {
+        accessToken = githubToken
+        parent(rootProject.tasks.named("publishGithub"))
+    }
 }
