@@ -36,9 +36,4 @@ public class PortalForcerMixin implements EntityAdderImpl {
     public void personal_Borders$setEntity(@Nullable Entity entity) {
         this.entity = entity;
     }
-
-    @Override
-    public @Nullable Entity personal_Borders$getEntity() {
-        return this.entity;
-    }
 }

@@ -14,7 +14,17 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerPlayNetworkHandlerMixin {
 
-    @ModifyReceiver(method = "handleInteract(Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;)V",
+    // All three packet handlers gate the target entity on the same border check.
+    // 26.2 renamed the spectate packet and its handler.
+    @ModifyReceiver(method = {
+            "handleInteract(Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;)V",
+            "handleAttack(Lnet/minecraft/network/protocol/game/ServerboundAttackPacket;)V",
+            //? if <26.2 {
+            "handleSpectateEntity(Lnet/minecraft/network/protocol/game/ServerboundSpectateEntityPacket;)V"
+            //?} else {
+            /*"handleSpectatorAction(Lnet/minecraft/network/protocol/game/ServerboundSpectatorActionPacket;)V"
+            *///?}
+            },
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
     private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos) {

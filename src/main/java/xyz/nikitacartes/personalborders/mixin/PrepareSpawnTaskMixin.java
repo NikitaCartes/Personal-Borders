@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
 
-import static xyz.nikitacartes.personalborders.PersonalBorders.getModifiedSpawnPoint;
-import static xyz.nikitacartes.personalborders.PersonalBorders.getOfflineBorderCache;
+import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 
 
 @Mixin(PrepareSpawnTask.class)
@@ -33,6 +32,8 @@ public class PrepareSpawnTaskMixin {
                     target = "Lnet/minecraft/world/level/storage/ServerLevelData;getRespawnData()Lnet/minecraft/world/level/storage/LevelData$RespawnData;"))
     private LevelData.RespawnData sendModifiedBorder(LevelData.RespawnData original) {
         BorderCache borderCache = getOfflineBorderCache(nameAndId.id());
+        // Read back by SpawnLocatingMixin: start() calls PlayerSpawnFinder.findSpawn further down.
+        pendingBorderCache = borderCache;
         if (borderCache != null) {
             ServerLevel world = server.getLevel(original.globalPos().dimension());
             if (world == null) {

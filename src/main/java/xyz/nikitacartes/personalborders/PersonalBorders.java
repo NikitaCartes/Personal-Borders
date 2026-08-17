@@ -48,6 +48,12 @@ public class PersonalBorders {
 
     public static Map<UUID, BorderCache> borders = new HashMap<>();
 
+    // Border of the player a vanilla lookup is running for, when that lookup resolves the border with no
+    // entity in scope: PlayerSpawnFinder.findSpawn and DismountHelper.findSafeDismountLocation. Every call
+    // path into those two passes a mixin that sets this field first, so a stale value is never read.
+    // Server thread only: a login handled off-thread can race with a respawn and pick the wrong border.
+    public static BorderCache pendingBorderCache;
+
     // Todo:Config
     // Teleport player nether portal: outside of border, or inside border
     // Teleport players in entity: together, or separate

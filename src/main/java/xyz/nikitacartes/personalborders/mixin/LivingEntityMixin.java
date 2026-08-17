@@ -7,12 +7,20 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
 
 import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
+
+    // Read back by DismountingMixin, inside DismountHelper.findSafeDismountLocation.
+    @Inject(method = "stopSleeping()V", at = @At("HEAD"))
+    private void sendModifiedBorder(CallbackInfo ci) {
+        pendingBorderCache = getBorderCache((LivingEntity) (Object) this);
+    }
 
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",

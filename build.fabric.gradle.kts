@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
-    id("me.modmuss50.mod-publish-plugin") version "0.8.4"
+    id("me.modmuss50.mod-publish-plugin") version "2.2.0"
 }
 
 // Tag this node's loader and version so [fabric."26.1"] keys resolve via bare property("...").
@@ -67,7 +67,7 @@ tasks.register<Copy>("collectJars") {
     group = "build"
     from(tasks.jar.map { it.archiveFile })
     into(rootProject.layout.buildDirectory.dir("libs"))
-    dependsOn("build")
+    dependsOn("build", rootProject.tasks.named("cleanCollectedJars"))
 }
 
 publishMods {
@@ -97,6 +97,8 @@ publishMods {
         targets.forEach(minecraftVersions::add)
         requires("fabric-api")
         optional("luckperms")
+        client.set(true)
+        server.set(true)
     }
     // Uploads this node's jar into the single release created by the root publishGithub task.
     github {
