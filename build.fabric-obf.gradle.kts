@@ -1,6 +1,8 @@
 plugins {
     id("java")
+    kotlin("jvm") version "2.4.0"
     id("fabric-loom") version "1.17-SNAPSHOT"
+    id("com.google.devtools.ksp") version "2.3.9"
     id("dev.kikugie.fletching-table.fabric") version "0.1.0-alpha.22"
     id("me.modmuss50.mod-publish-plugin") version "2.2.0"
 }
