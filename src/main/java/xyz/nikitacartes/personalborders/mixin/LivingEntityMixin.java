@@ -16,7 +16,7 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.*;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
-    // Read back by DismountingMixin, inside DismountHelper.findSafeDismountLocation.
+    // Read back by DismountingMixin.
     @Inject(method = "stopSleeping()V", at = @At("HEAD"))
     private void sendModifiedBorder(CallbackInfo ci) {
         pendingBorderCache = getBorderCache((LivingEntity) (Object) this);
@@ -45,9 +45,16 @@ public class LivingEntityMixin {
         return defaultBorder;
     }
 
+    // 1.21.9: getDamageSafeZone became getSafeZone.
+    //? if >=1.21.9 {
     @ModifyReceiver(method = "baseTick()V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/border/WorldBorder;getSafeZone()D"))
+    //?} else {
+    /*@ModifyReceiver(method = "baseTick()V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;getDamageSafeZone()D"))
+    *///?}
     private WorldBorder modifySafeZone(WorldBorder defaultBorder) {
         LivingEntity entity = ((LivingEntity)(Object)this);
         BorderCache borderCache = getBorderCache(entity);

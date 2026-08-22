@@ -2,23 +2,7 @@
   "required": true,
   "package": "xyz.nikitacartes.personalborders.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "BedBlockMixin",
-    "CollisionViewMixin",
-    "DismountingMixin",
-    "EndPortalBlockMixin",
-    "EntityMixin",
-    "LivingEntityMixin",
-    "NetherPortalBlockMixin",
-    "PlayerManagerMixin",
-    "PortalForcerMixin",
-    "PrepareSpawnTaskMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin",
-    "ServerWorldMixin",
-    "SpawnLocatingMixin",
-    "TeleportTargetMixin"
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

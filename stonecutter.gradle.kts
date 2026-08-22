@@ -10,7 +10,7 @@ stonecutter parameters {
 }
 
 stonecutter.tasks {
-    // Sort published artifacts by version when running the aggregated publishMods.
+    // Sort published artifacts by version.
     order("publishMods")
 }
 
@@ -18,8 +18,7 @@ tasks.register<Delete>("cleanCollectedJars") {
     delete(layout.buildDirectory.dir("libs"))
 }
 
-// One GitHub release for the whole version matrix: this root task creates it (empty),
-// and every node's publishGithub uploads its jar into it via `parent`.
+// One GitHub release for the whole matrix: this task creates it, nodes upload into it.
 publishMods {
     val githubToken = System.getenv("GITHUB_TOKEN") ?: ""
     val modVersion = findProperty("mod_version")?.toString()

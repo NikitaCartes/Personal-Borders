@@ -17,6 +17,9 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(ServerLevel.class)
 public class ServerWorldMixin {
 
+    // 1.21.5: mayInteract widened from Player to Entity. The return-value check stops
+    // non-players reaching outside their owner's border.
+    //? if >=1.21.5 {
     @ModifyReceiver(method = "mayInteract(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Z",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
@@ -39,4 +42,16 @@ public class ServerWorldMixin {
         }
         return original;
     }
+    //?} else {
+    /*@ModifyReceiver(method = "mayInteract(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
+    private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos, @Local(argsOnly = true) Player entity) {
+        BorderCache borderCache = getBorderCache(entity);
+        if (borderCache != null) {
+            return borderCache.getWorldBorder(entity.level());
+        }
+        return defaultBorder;
+    }
+    *///?}
 }

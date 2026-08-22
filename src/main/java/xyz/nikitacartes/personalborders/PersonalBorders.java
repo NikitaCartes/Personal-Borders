@@ -24,10 +24,12 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
+//? if >=1.21.9 {
 import net.minecraft.core.GlobalPos;
+import net.minecraft.world.level.storage.LevelData;
+//?}
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.border.WorldBorder;
 import xyz.nikitacartes.personalborders.listener.LuckPermsListener;
 import xyz.nikitacartes.personalborders.utils.BorderCache;
@@ -48,10 +50,8 @@ public class PersonalBorders {
 
     public static Map<UUID, BorderCache> borders = new HashMap<>();
 
-    // Border of the player a vanilla lookup is running for, when that lookup resolves the border with no
-    // entity in scope: PlayerSpawnFinder.findSpawn and DismountHelper.findSafeDismountLocation. Every call
-    // path into those two passes a mixin that sets this field first, so a stale value is never read.
-    // Server thread only: a login handled off-thread can race with a respawn and pick the wrong border.
+    // Border for vanilla lookups that carry no entity: DismountHelper.findSafeDismountLocation and
+    // PlayerSpawnFinder.findSpawn (1.21.9+). Every caller sets it first. Server thread only.
     public static BorderCache pendingBorderCache;
 
     // Todo:Config
@@ -64,7 +64,6 @@ public class PersonalBorders {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onStartServer);
 
         ServerPlayConnectionEvents.JOIN.register((netHandler, packetSender, server) -> onPlayerJoin(netHandler.getPlayer().getUUID()));
-        // ServerPlayConnectionEvents.DISCONNECT.register((netHandler, server) -> borders.remove(netHandler.getPlayer().getUUID()));
     }
     //?} else {
     /*public PersonalBorders() {
@@ -174,7 +173,11 @@ public class PersonalBorders {
                 .withContext("warning.distance", Integer.toString(defaultBorder.getWarningBlocks()))
                 .withContext("warning.time", Integer.toString(defaultBorder.getWarningTime()))
                 .withContext("damage.amount", Double.toString(defaultBorder.getDamagePerBlock()))
+                //? if >=1.21.9 {
                 .withContext("damage.buffer", Double.toString(defaultBorder.getSafeZone()))
+                //?} else {
+                /*.withContext("damage.buffer", Double.toString(defaultBorder.getDamageSafeZone()))
+                *///?}
                 .build();
     }
 
@@ -222,19 +225,33 @@ public class PersonalBorders {
             return uuid;
         }
 
-        if (entity instanceof Projectile projectileEntity) {
-            if (projectileEntity.owner == null) {
+        // 1.21.6: Projectile.owner became an EntityReference.
+        //? if >=1.21.6 {
+        if (entity instanceof Projectile projectile) {
+            if (projectile.owner == null) {
                 return null;
             }
-            return projectileEntity.owner.getUUID();
+            return projectile.owner.getUUID();
         }
+        //?} else {
+        /*if (entity instanceof Projectile projectile) {
+            return projectile.ownerUUID;
+        }
+        *///?}
 
-        if (entity instanceof OwnableEntity tameable) {
-            if (tameable.getOwnerReference() == null) {
+        // 1.21.5: the owner UUID getter became EntityReference. AbstractHorse is OwnableEntity everywhere.
+        //? if >=1.21.5 {
+        if (entity instanceof OwnableEntity ownable) {
+            if (ownable.getOwnerReference() == null) {
                 return null;
             }
-            return tameable.getOwnerReference().getUUID();
+            return ownable.getOwnerReference().getUUID();
         }
+        //?} else {
+        /*if (entity instanceof OwnableEntity ownable) {
+            return ownable.getOwnerUUID();
+        }
+        *///?}
 
         return null;
     }
@@ -258,6 +275,8 @@ public class PersonalBorders {
         return null;
     }
 
+    // 1.21.9: the spawn BlockPos became a RespawnData record.
+    //? if >=1.21.9 {
     public static LevelData.RespawnData getModifiedSpawnPoint(Level world, WorldBorder worldBorder, LevelData.RespawnData originalSpawnPos) {
         if (!worldBorder.isWithinBounds(originalSpawnPos.pos())) {
             BlockPos newBlockPos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, BlockPos.containing(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
@@ -266,4 +285,13 @@ public class PersonalBorders {
 
         return originalSpawnPos;
     }
+    //?} else {
+    /*public static BlockPos getModifiedSpawnPoint(Level world, WorldBorder worldBorder, BlockPos originalSpawnPos) {
+        if (!worldBorder.isWithinBounds(originalSpawnPos)) {
+            return world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, BlockPos.containing(worldBorder.getCenterX(), 0.0, worldBorder.getCenterZ()));
+        }
+
+        return originalSpawnPos;
+    }
+    *///?}
 }

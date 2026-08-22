@@ -28,8 +28,8 @@ public class DismountingMixin {
         return defaultBorder;
     }
 
-    // Stand-up search after leaving a bed or a respawn anchor. The method carries an entity type, not the
-    // entity, so the border comes from the player that started the search.
+    // Only an entity type in scope, so the border comes from pendingBorderCache, set by
+    // LivingEntityMixin (stopSleeping) or ServerPlayerEntityMixin (respawn).
     @ModifyReceiver(method = "findSafeDismountLocation(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/CollisionGetter;Lnet/minecraft/core/BlockPos;Z)Lnet/minecraft/world/phys/Vec3;",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/world/phys/AABB;)Z"))

@@ -83,12 +83,20 @@ public class BorderCache {
         int warningBlocks = Integer.parseInt(context.getOrDefault("warning.distance", Set.of(Integer.toString(defaultBorder.getWarningBlocks()))).iterator().next());
         int warningTime = Integer.parseInt(context.getOrDefault("warning.time", Set.of(Integer.toString(defaultBorder.getWarningTime()))).iterator().next());
         double damagePerBlock = Double.parseDouble(context.getOrDefault("damage.amount", Set.of(Double.toString(defaultBorder.getDamagePerBlock()))).iterator().next());
+        //? if >=1.21.9 {
         double safeZone = Double.parseDouble(context.getOrDefault("damage.buffer", Set.of(Double.toString(defaultBorder.getSafeZone()))).iterator().next());
+        //?} else {
+        /*double safeZone = Double.parseDouble(context.getOrDefault("damage.buffer", Set.of(Double.toString(defaultBorder.getDamageSafeZone()))).iterator().next());
+        *///?}
 
         WorldBorder border = new WorldBorder();
         border.setCenter(centerX, centerZ);
         border.setDamagePerBlock(damagePerBlock);
+        //? if >=1.21.9 {
         border.setSafeZone(safeZone);
+        //?} else {
+        /*border.setDamageSafeZone(safeZone);
+        *///?}
         border.setWarningBlocks(warningBlocks);
         border.setWarningTime(warningTime);
         border.setSize(distance);

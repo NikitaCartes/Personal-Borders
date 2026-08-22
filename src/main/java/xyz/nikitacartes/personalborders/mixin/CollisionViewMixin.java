@@ -32,6 +32,8 @@ public interface CollisionViewMixin {
         return original.call(instance);
     }
 
+    // clipIncludingBorder exists from 1.21.2 on.
+    //? if >=1.21.3 {
     @WrapOperation(method = "clipIncludingBorder(Lnet/minecraft/world/level/ClipContext;)Lnet/minecraft/world/phys/BlockHitResult;",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/CollisionGetter;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
@@ -43,7 +45,7 @@ public interface CollisionViewMixin {
         }
         return original.call(instance);
     }
-
+    //?}
 
     @WrapOperation(method = "findFreePosition(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/shapes/VoxelShape;Lnet/minecraft/world/phys/Vec3;DDD)Ljava/util/Optional;",
             at = @At(value = "INVOKE",

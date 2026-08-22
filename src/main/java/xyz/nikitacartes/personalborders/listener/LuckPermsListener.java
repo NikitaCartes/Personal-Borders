@@ -75,15 +75,6 @@ public class LuckPermsListener {
     }
 
     private void updateForTarget(Group group) {
-        // This doesn't work, but I don't know how to fix it
-        /*
-        NodeMatcher<InheritanceNode> matcher = NodeMatcher.key(InheritanceNode.builder(group).build());
-
-        // Search all users for a match
-        this.luckPerms.getUserManager().searchAll(matcher).thenAccept((Map<UUID, Collection<InheritanceNode>> map) -> {
-            updateWorldBorder(map.keySet());
-        });
-         */
         updateWorldBorder(borders.keySet());
     }
 

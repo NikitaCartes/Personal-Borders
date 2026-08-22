@@ -14,19 +14,28 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerPlayNetworkHandlerMixin {
 
-    // All three packet handlers gate the target entity on the same border check.
-    // 26.2 renamed the spectate packet and its handler.
-    @ModifyReceiver(method = {
+    // 26.1: attack and spectate became separate packets. 26.2: the spectate packet was renamed.
+    //? if >=26.2 {
+    /*@ModifyReceiver(method = {
             "handleInteract(Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;)V",
             "handleAttack(Lnet/minecraft/network/protocol/game/ServerboundAttackPacket;)V",
-            //? if <26.2 {
-            "handleSpectateEntity(Lnet/minecraft/network/protocol/game/ServerboundSpectateEntityPacket;)V"
-            //?} else {
-            /*"handleSpectatorAction(Lnet/minecraft/network/protocol/game/ServerboundSpectatorActionPacket;)V"
-            *///?}
+            "handleSpectatorAction(Lnet/minecraft/network/protocol/game/ServerboundSpectatorActionPacket;)V"
             },
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
+    *///?} elif >=26.1 {
+    @ModifyReceiver(method = {
+            "handleInteract(Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;)V",
+            "handleAttack(Lnet/minecraft/network/protocol/game/ServerboundAttackPacket;)V",
+            "handleSpectateEntity(Lnet/minecraft/network/protocol/game/ServerboundSpectateEntityPacket;)V"
+            },
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
+    //?} else {
+    /*@ModifyReceiver(method = "handleInteract(Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/border/WorldBorder;isWithinBounds(Lnet/minecraft/core/BlockPos;)Z"))
+    *///?}
     private WorldBorder modifyContains(WorldBorder defaultBorder, BlockPos pos) {
         LivingEntity entity = ((ServerGamePacketListenerImpl)(Object)this).player;
         BorderCache borderCache = getBorderCache(entity);

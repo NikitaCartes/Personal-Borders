@@ -23,7 +23,7 @@
 		"personal-borders.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.5",
+		"fabricloader": ">=${loader_version}",
 		"minecraft": "${supported_minecraft_version}",
 		"java": ">=21",
 		"fabric-api": "*",

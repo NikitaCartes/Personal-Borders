@@ -1,5 +1,7 @@
 package xyz.nikitacartes.personalborders.mixin;
 
+// PrepareSpawnTask exists from 1.21.9 on.
+//? if >=1.21.9 {
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.NameAndId;
@@ -32,7 +34,7 @@ public class PrepareSpawnTaskMixin {
                     target = "Lnet/minecraft/world/level/storage/ServerLevelData;getRespawnData()Lnet/minecraft/world/level/storage/LevelData$RespawnData;"))
     private LevelData.RespawnData sendModifiedBorder(LevelData.RespawnData original) {
         BorderCache borderCache = getOfflineBorderCache(nameAndId.id());
-        // Read back by SpawnLocatingMixin: start() calls PlayerSpawnFinder.findSpawn further down.
+        // Read back by SpawnLocatingMixin.
         pendingBorderCache = borderCache;
         if (borderCache != null) {
             ServerLevel world = server.getLevel(original.globalPos().dimension());
@@ -45,3 +47,4 @@ public class PrepareSpawnTaskMixin {
         return original;
     }
 }
+//?}

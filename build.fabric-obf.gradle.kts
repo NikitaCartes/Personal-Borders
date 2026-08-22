@@ -1,10 +1,11 @@
 plugins {
     id("java")
-    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    id("fabric-loom") version "1.17-SNAPSHOT"
+    id("dev.kikugie.fletching-table.fabric") version "0.1.0-alpha.22"
     id("me.modmuss50.mod-publish-plugin") version "2.2.0"
 }
 
-// Tag this node's loader and version so [fabric."26.1"] keys resolve via bare property("...").
+// Tags make [fabric."1.21.1"] keys resolve via bare property("...").
 stonecutter {
     val (version, loader) = current.project.split('-', limit = 2)
     properties.tags(version, loader)
@@ -14,28 +15,29 @@ repositories {
     mavenCentral()
 }
 
+val javaVersion = property("java_version").toString().toInt()
+
 base.archivesName = "${property("mod_id")}-fabric-mc${property("minecraft_version")}"
 version = property("mod_version").toString()
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion)) }
 }
 
-// 26.1+ runtime is already Mojang-mapped, so the accesswidener is in the `official` namespace.
-val awFile = "personal-borders.accesswidener"
+// Loom remaps it, so the accesswidener is in the `named` namespace: Mojang names.
+val awFile = "${property("access_file")}.accesswidener"
 
 loom {
     accessWidenerPath = rootProject.file("src/main/resources/accesswidener/$awFile")
 }
 
 dependencies {
-    // Fabric (26.1+ ships Mojang-mapped, so no `mappings(...)` line is needed)
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
-    implementation("net.fabricmc:fabric-loader:${property("loader_version")}")
+    mappings(loom.officialMojangMappings())
+    modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
 
-    implementation(fabricApi.module("fabric-lifecycle-events-v1", property("fabric_version").toString()))
-    implementation(fabricApi.module("fabric-networking-api-v1", property("fabric_version").toString()))
+    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", property("fabric_version").toString()))
+    modImplementation(fabricApi.module("fabric-networking-api-v1", property("fabric_version").toString()))
 
     // LuckPerms API (provided at runtime by the LuckPerms mod)
     compileOnly("net.luckperms:api:${property("luckperms_version")}")
@@ -43,7 +45,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release.set(25)
+    options.release.set(javaVersion)
 }
 
 tasks.jar {
@@ -53,19 +55,30 @@ tasks.jar {
 val modExpansions = mapOf(
     "version" to project.version.toString(),
     "supported_minecraft_version" to property("supported_minecraft_version").toString(),
-    "accessWidener" to awFile
+    "accessWidener" to awFile,
+    "loader_version" to property("loader_version").toString()
 )
 
 tasks.processResources {
     inputs.properties(modExpansions)
+
     filesMatching("fabric.mod.json") { expand(modExpansions) }
-    // Mojang-mapped runtime needs no mixin refmap and no NeoForge metadata.
+    // Fabric needs no NeoForge metadata, and only one accesswidener is shipped.
     exclude("META-INF/neoforge.mods.toml", "accesstransformer/**")
+    eachFile {
+        if (path.startsWith("accesswidener/") && name != awFile) exclude()
+    }
+}
+
+fletchingTable {
+    mixins.create("main") {
+        mixin("default", "personal-borders.mixins.json")
+    }
 }
 
 tasks.register<Copy>("collectJars") {
     group = "build"
-    from(tasks.jar.map { it.archiveFile })
+    from(tasks.remapJar.map { it.archiveFile })
     into(rootProject.layout.buildDirectory.dir("libs"))
     dependsOn("build", rootProject.tasks.named("cleanCollectedJars"))
 }
@@ -75,7 +88,7 @@ publishMods {
     val curseforgeToken = System.getenv("CURSEFORGE_TOKEN") ?: ""
     val githubToken = System.getenv("GITHUB_TOKEN") ?: ""
 
-    file = tasks.jar.get().archiveFile
+    file = tasks.remapJar.get().archiveFile
     dryRun = modrinthToken.isEmpty() || curseforgeToken.isEmpty() || githubToken.isEmpty()
     displayName = "${property("display_name")} ${project.version}"
     version = project.version.toString()
@@ -100,7 +113,7 @@ publishMods {
         client.set(true)
         server.set(true)
     }
-    // Uploads this node's jar into the single release created by the root publishGithub task.
+    // Uploads into the release created by the root publishGithub task.
     github {
         accessToken = githubToken
         parent(rootProject.tasks.named("publishGithub"))

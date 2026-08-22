@@ -11,16 +11,31 @@ pluginManagement {
 
 plugins {
     id("dev.kikugie.stonecutter") version "0.9.2"
+    // Nodes need Java 21 and Java 25, so a missing toolchain is downloaded.
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
 }
 
 stonecutter {
     create(rootProject) {
-        // 26.1+ ships Mojang-mapped (deobfuscated). 26.1 and 26.2 are split because the entity
-        // movement-collision border lookup moved methods in 26.2 (see EntityMixin).
-        versions("26.1-fabric" to "26.1").buildscript("build.fabric.gradle.kts")
-        versions("26.2-fabric" to "26.2").buildscript("build.fabric.gradle.kts")
-        versions("26.1-neoforge" to "26.1").buildscript("build.neoforge.gradle.kts")
-        versions("26.2-neoforge" to "26.2").buildscript("build.neoforge.gradle.kts")
+        // One node for each range of Minecraft versions with the same hooked members:
+        //   1.21.1 -> 1.21 .. 1.21.1     1.21.3 -> 1.21.2 .. 1.21.4    1.21.5 -> 1.21.5
+        //   1.21.6 -> 1.21.6 .. 1.21.8   1.21.9 -> 1.21.9 .. 1.21.11
+        //   26.1   -> 26.1 .. 26.1.2     26.2   -> 26.2+
+        val obfuscated = listOf("1.21.1", "1.21.3", "1.21.5", "1.21.6", "1.21.9")
+        val deobfuscated = listOf("26.1", "26.2")
+
+        // Obfuscated: Fabric needs the remapping Loom plugin.
+        obfuscated.forEach { mc ->
+            versions("$mc-fabric" to mc).buildscript("build.fabric-obf.gradle.kts")
+        }
+        // Mojang-mapped: Fabric needs no remapping.
+        deobfuscated.forEach { mc ->
+            versions("$mc-fabric" to mc).buildscript("build.fabric-deobf.gradle.kts")
+        }
+        // NeoForge is on Mojang names everywhere, so one buildscript covers every node.
+        (obfuscated + deobfuscated).forEach { mc ->
+            versions("$mc-neoforge" to mc).buildscript("build.neoforge.gradle.kts")
+        }
         vcsVersion = "26.1-fabric"
     }
 }

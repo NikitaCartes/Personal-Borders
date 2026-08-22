@@ -22,9 +22,16 @@ import static xyz.nikitacartes.personalborders.PersonalBorders.getBorderCache;
 @Mixin(NetherPortalBlock.class)
 public class NetherPortalBlockMixin {
 
+    // 1.21.2: DimensionTransition became TeleportTransition.
+    //? if >=1.21.3 {
     @WrapOperation(method = "getPortalDestination(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/portal/TeleportTransition;",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    //?} else {
+    /*@WrapOperation(method = "getPortalDestination(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/portal/DimensionTransition;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"))
+    *///?}
     private WorldBorder sendModifiedBorder(ServerLevel world, Operation<WorldBorder> original, @Local(argsOnly = true) Entity entity) {
         BorderCache borderCache = getBorderCache(entity);
         if (borderCache != null) {
@@ -33,9 +40,15 @@ public class NetherPortalBlockMixin {
         return original.call(world);
     }
 
+    //? if >=1.21.3 {
     @ModifyReceiver(method = "getExitPortal(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/level/border/WorldBorder;)Lnet/minecraft/world/level/portal/TeleportTransition;",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/portal/PortalForcer;createPortal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;)Ljava/util/Optional;"))
+    //?} else {
+    /*@ModifyReceiver(method = "getExitPortal(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/level/border/WorldBorder;)Lnet/minecraft/world/level/portal/DimensionTransition;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/portal/PortalForcer;createPortal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction$Axis;)Ljava/util/Optional;"))
+    *///?}
     private PortalForcer sendModifiedBorder(PortalForcer portalForcer, BlockPos pos, Direction.Axis axis, @Local(argsOnly = true) Entity entity) {
         ((EntityAdderImpl) portalForcer).personal_Borders$setEntity(entity);
         return portalForcer;
